@@ -1,4 +1,4 @@
-package org.hbrs.ooka.uebung1.entities;
+package org.hbrs.seka.uebung1.entities;
 
 /**
  * Klasse zur Repräsentation eines Produkts. Dies kann um weitere Attribute gerne erweitert werden.

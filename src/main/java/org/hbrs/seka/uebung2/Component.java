@@ -1,4 +1,4 @@
-package org.hbrs.ooka.uebung2;
+package org.hbrs.seka.uebung2;
 
 public class Component {
     public void start_init(){

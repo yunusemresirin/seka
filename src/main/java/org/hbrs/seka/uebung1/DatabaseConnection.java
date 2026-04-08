@@ -1,4 +1,4 @@
-package org.hbrs.ooka.uebung1;
+package org.hbrs.seka.uebung1;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

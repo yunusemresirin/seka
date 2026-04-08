@@ -1,17 +1,22 @@
-import org.hbrs.ooka.uebung1.DatabaseConnection;
+package org.hbrs.seka.uebung1.test;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.hbrs.ooka.uebung1.entities.Product;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.ResultSet;
+
+// Internal Packages
+import org.hbrs.seka.uebung1.entities.Product;
+import org.hbrs.seka.uebung1.DatabaseConnection;
+
 
 import static org.junit.Assert.assertEquals;
 

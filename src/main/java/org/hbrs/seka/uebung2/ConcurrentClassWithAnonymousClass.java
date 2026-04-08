@@ -1,4 +1,4 @@
-package org.hbrs.ooka.uebung2;
+package org.hbrs.seka.uebung2;
 
 public class ConcurrentClassWithAnonymousClass {
     public static void main(String[] args) {

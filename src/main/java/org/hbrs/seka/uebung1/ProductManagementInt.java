@@ -1,6 +1,6 @@
-package org.hbrs.ooka.uebung1;
+package org.hbrs.seka.uebung1;
 
-import org.hbrs.ooka.uebung1.entities.Product;
+import org.hbrs.seka.uebung1.entities.Product;
 import java.util.List;
 
 /**
