@@ -7,6 +7,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("ALL")
 public class ProductRepository {
 
     private static Connection connection;
@@ -14,15 +15,16 @@ public class ProductRepository {
     // ------- Create -------
 
     public void save(@NotNull Product product) {
-        String sql1 = "INSERT INTO products (name, price) VALUES (?, ?)";
+        String sql1 = "INSERT INTO products (id, name, price) VALUES (?, ?, ?)";
 
         try {
             PreparedStatement pstmt = connection.prepareStatement(
                     sql1
 //                    ,Statement.RETURN_GENERATED_KEYS
             );
-            pstmt.setString(1, product.getName());
-            pstmt.setDouble(2, product.getPrice());
+            pstmt.setInt(1, product.getId());
+            pstmt.setString(2, product.getName());
+            pstmt.setDouble(3, product.getPrice());
             pstmt.executeUpdate();
 
 //            ID des Produktes kann u.U. aus dem ResultSet gelesen werden
@@ -62,7 +64,7 @@ public class ProductRepository {
         return products.toArray(new Product[0]);
     }
 
-    public Product[] findByName(String name) {
+    public Product[] findByName(@NotNull String name) {
         List<Product> products = new ArrayList<>();
         String sql = "SELECT * FROM products WHERE name = ?";
 
@@ -85,7 +87,7 @@ public class ProductRepository {
 
     // ------- Update -------
 
-    public void update(Product product) {
+    public void update(@NotNull Product product) {
         String sql = "UPDATE products SET name = ?, price = ? WHERE id = ?";
 
         try {
@@ -101,8 +103,8 @@ public class ProductRepository {
 
     // ------- Delete -------
 
-    public void delete(Product product) {
-        // Bei Constraints kann es zu Fehlern kommen, wenn das Produkt noch in anderen Tabellen referenziert wird
+    public void delete(@NotNull Product product) {
+        // Bei Constraints kann es zu Fehlern kommen, wenn das Produkt noch in anderen Tabellen referenziert wird.
         String sql = "DELETE FROM products WHERE id = ?";
 
         try {
@@ -129,6 +131,7 @@ public class ProductRepository {
         try {
             DatabaseConnection.openSession();
             connection = DatabaseConnection.getConnection();
+            createProductsTableIfNotExists();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -137,6 +140,22 @@ public class ProductRepository {
     public void closeConnection() {
         DatabaseConnection.closeSession();
         connection = null;
+    }
+
+    private void createProductsTableIfNotExists() {
+        String sql = """
+                CREATE TABLE IF NOT EXISTS products (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    name VARCHAR(255) NOT NULL,
+                    price DOUBLE NOT NULL
+                )
+                """;
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Tabelle products konnte nicht erstellt werden.", e);
+        }
     }
 
 }

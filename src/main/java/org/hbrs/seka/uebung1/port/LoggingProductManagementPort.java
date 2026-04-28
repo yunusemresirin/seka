@@ -18,7 +18,7 @@ public class LoggingProductManagementPort implements ProductManagementInt {
 
     @Override
     public void openSession() {
-        logger.log("Zugriff auf ProductManagement über Methode openSession");
+        logger.log("Zugriff auf ProductManagement über Methode openSession.");
         delegate.openSession();
     }
 
@@ -33,37 +33,46 @@ public class LoggingProductManagementPort implements ProductManagementInt {
 
     @Override
     public Product[] getAllProducts() {
-        logger.log("Zugriff auf ProductManagement über Methode getAllProducts");
+        logger.log("Zugriff auf ProductManagement über Methode getAllProducts.");
         return delegate.getAllProducts();
     }
 
     @Override
     public void saveProduct(Product product) {
-        logger.log("Zugriff auf ProductManagement über Methode saveProduct");
+        logger.log(
+                "Zugriff auf ProductManagement über Methode saveProduct. " +
+                        "Produkt: " + product
+        );
         delegate.saveProduct(product);
     }
 
     @Override
     public void deleteProduct(Product product) {
-        logger.log("Zugriff auf ProductManagement über Methode deleteProduct");
+        logger.log(
+                "Zugriff auf ProductManagement über Methode deleteProduct. " +
+                        "Produkt: " + product
+        );
         delegate.deleteProduct(product);
     }
 
     @Override
     public void deleteAllProducts() {
-        logger.log("Zugriff auf ProductManagement über Methode deleteAllProducts");
+        logger.log("Zugriff auf ProductManagement über Methode deleteAllProducts.");
         delegate.deleteAllProducts();
     }
 
     @Override
     public void updateProduct(Product product) {
-        logger.log("Zugriff auf ProductManagement über Methode updateProduct");
+        logger.log(
+                "Zugriff auf ProductManagement über Methode updateProduct. " +
+                        "Produkt: " + product
+        );
         delegate.updateProduct(product);
     }
 
     @Override
     public void closeSession() {
-        logger.log("Zugriff auf ProductManagement über Methode closeSession");
+        logger.log("Zugriff auf ProductManagement über Methode closeSession.");
         delegate.closeSession();
     }
 }
