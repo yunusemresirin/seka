@@ -1,4 +1,4 @@
-package org.hbrs.seka.uebung1.entities;
+package org.hbrs.seka.uebung1.model;
 
 /**
  * Klasse zur Repräsentation eines Produkts. Dies kann um weitere Attribute gerne erweitert werden.
@@ -40,9 +40,8 @@ public class Product {
 
     @Override
     public String toString() {
-        // Wir lassen mal die ID eines Produkts weg, da diese nicht immer gesetzt ist bzw. ohnehin
-        // über Auto-Increment in der Datenbank gesetzt wird.
         return "Product{" +
+                "id=" + id +
                 ", name='" + name + '\'' +
                 ", price=" + price +
                 '}';
@@ -50,10 +49,11 @@ public class Product {
 
     /**
      * Vergleich von zwei Produkten anhand des Namens und des Preises.
-     * Wichtig für den Junit-Test!!
+     * ID wird nicht berücksichtigt, da es in der Datenbank iterativ generiert wird.
      * @param o
      * @return
      */
+    @Override
     public boolean equals(Object o) {
         if (o instanceof Product) {
             Product p = (Product) o;

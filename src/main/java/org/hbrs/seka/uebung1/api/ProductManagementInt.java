@@ -1,7 +1,6 @@
-package org.hbrs.seka.uebung1;
+package org.hbrs.seka.uebung1.api;
 
-import org.hbrs.seka.uebung1.entities.Product;
-import java.util.List;
+import org.hbrs.seka.uebung1.model.Product;
 
 /**
  * Spezifikation des Interfaces ProductManagementInt:
@@ -19,9 +18,15 @@ import java.util.List;
 
 public interface ProductManagementInt {
     // Auswahl von CRUD-Methoden (weitere können hinzugefügt werden)
-    public List<Product> getProductByName(String name);
+    public Product[] getProductByName(String name);
+    public Product[] getAllProducts();
 
-    // Lifecycle-Methoden (dürfen nicht verändert werden, siehe Spezifikation im Kommentar
+    public void saveProduct(Product product);
+    public void deleteProduct(Product product);
+    public void deleteAllProducts();
+    public void updateProduct(Product product);
+
+    // Lifecycle-Methoden (dürfen nicht verändert werden, siehe Spezifikation im Kommentar)
 
     // Öffnen einer Session (hier sollte die Verbindung zur Datenbank hergestellt werden)
     public void openSession();

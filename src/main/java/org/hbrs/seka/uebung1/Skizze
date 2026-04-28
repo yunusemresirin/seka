@@ -1,0 +1,55 @@
+--- Projektstruktur ---
+
+productmanagement
+│
+├─ api
+│  └─ ProductManagementInt        ← Provided Interface (Port)
+│
+├─ port
+│  └─ ProductManagementPort       ← Proxy / Port-Klasse
+│
+├─ internal
+│  ├─ ProductController           ← interne Verarbeitungslogik + Caching
+│  ├─ ProductRepository           ← DB-Zugriffe
+│  └─ DatabaseConnection          ← JDBC-Verbindung
+│
+└─ model
+   └─ Product                     ← Entität
+
+--- Caching ---
+
+get       → Cache-Eintrag lesen
+put       → Ergebnis speichern/ersetzen
+remove    → gezielt einen Cache-Eintrag entfernen
+update    → gezielt einen Cache-Eintrag aktualisieren
+clear     → kompletten Cache leeren, z. B. bei deleteAll
+contains  → prüfen, ob ein Eintrag existiert
+
+--- Logging ---
+
+Client
+  |
+  v
+LoggingProductManagementPort   ← Logging (FA4)
+  |
+  v
+ProductManagementPort          ← "reiner" Fach-Port
+  |
+  v
+ProductController ...
+
+-- Deployment --
+
+productmanagement-component/
+├─ pom.xml
+└─ src
+   └─ main
+      └─ java
+         └─ org.hbrs.seka.uebung1
+            ├─ api                ← NUR das Interface sichtbar
+            │  └─ ProductManagementInt
+            ├─ component          ← Factory
+            │  └─ ProductManagementComponent
+            ├─ port               ← Proxy / Ports
+            ├─ internal           ← Controller, Repo, DB
+            └─ model              ← Product
