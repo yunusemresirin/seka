@@ -1,4 +1,4 @@
-package org.hbrs.seka.uebung2;
+package org.hbrs.seka.uebung2.records;
 
 import org.hbrs.seka.uebung2.annotations.Start;
 import org.hbrs.seka.uebung2.annotations.Stop;

@@ -1,4 +1,4 @@
-package org.hbrs.seka.uebung2;
+package org.hbrs.seka.uebung2.records;
 
 import java.lang.reflect.Method;
 import java.net.URLClassLoader;
