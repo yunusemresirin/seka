@@ -1,9 +1,9 @@
-package org.hbrs.seka.uebung2;
+package org.hbrs.seka.uebung2.core.component;
 
-import org.hbrs.seka.uebung2.annotations.Start;
-import org.hbrs.seka.uebung2.annotations.Stop;
-import org.hbrs.seka.uebung2.records.Component;
-import org.hbrs.seka.uebung2.records.RunningComponent;
+import org.hbrs.seka.uebung2.core.component.annotations.Start;
+import org.hbrs.seka.uebung2.core.component.annotations.Stop;
+import org.hbrs.seka.uebung2.core.component.records.Component;
+import org.hbrs.seka.uebung2.core.component.records.RunningComponent;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -15,10 +15,65 @@ import java.util.jar.JarFile;
 
 public class ComponentRunner {
 
+    public void validateComponent(Component component) {
+        try {
+            File jar = component.jarPath().toFile();
+
+            if (!jar.exists() || !jar.isFile() || !jar.getName().endsWith(".jar")) {
+                throw new IllegalArgumentException("Komponente muss ein gültiges .jar-File sein.");
+            }
+
+            int startingClassCount = 0;
+
+            try (JarFile jarFile = new JarFile(jar);
+                 URLClassLoader classLoader = URLClassLoader.newInstance(
+                         new URL[]{new URL("jar:file:" + jar.getAbsolutePath() + "!/")},
+                         ComponentRunner.class.getClassLoader()
+                 )) {
+
+                Enumeration<JarEntry> entries = jarFile.entries();
+
+                while (entries.hasMoreElements()) {
+                    JarEntry jarEntry = entries.nextElement();
+
+                    if (jarEntry.isDirectory() || !jarEntry.getName().endsWith(".class")) {
+                        continue;
+                    }
+
+                    String className = jarEntry.getName()
+                            .substring(0, jarEntry.getName().length() - 6)
+                            .replace('/', '.');
+
+                    Class<?> clazz = classLoader.loadClass(className);
+
+                    Method startMethod = findStartMethod(clazz);
+                    Method stopMethod = findStopMethod(clazz);
+
+                    if (startMethod != null || stopMethod != null) {
+                        if (startMethod == null || stopMethod == null) {
+                            throw new IllegalStateException(
+                                    "Starting Class muss genau eine @Start- und eine @Stop-Methode besitzen: " + className
+                            );
+                        }
+
+                        startingClassCount++;
+                    }
+                }
+            }
+
+            if (startingClassCount != 1) {
+                throw new IllegalStateException(
+                        "Ein Komponenten-JAR muss genau eine Starting Class enthalten. Gefunden: " + startingClassCount
+                );
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("Komponentenmodell ist ungültig.", e);
+        }
+    }
+
     public RunningComponent startComponent(Component component) {
         try {
-            // Übernommen von https://stackoverflow.com/questions/11016092/how-to-load-classes-at-runtime-from-a-folder-or-jar
-
             File jar = component.jarPath().toFile();
 
             JarFile jarFile = new JarFile(jar);
@@ -50,7 +105,7 @@ public class ComponentRunner {
                 Method startMethod = findStartMethod(clazz);
                 Method stopMethod = findStopMethod(clazz);
 
-                if (startMethod != null) {
+                if (startMethod != null && stopMethod != null) {
                     Object instance = clazz.getDeclaredConstructor().newInstance();
 
                     Thread thread = new Thread(() -> {
@@ -79,7 +134,7 @@ public class ComponentRunner {
             classLoader.close();
 
             throw new IllegalStateException(
-                    "Keine Klasse mit einer @Start-Methode im JAR gefunden."
+                    "Keine gültige Starting Class mit @Start- und @Stop-Methode gefunden."
             );
 
         } catch (Exception e) {

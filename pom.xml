@@ -7,11 +7,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.hbrs.seka</groupId>
-    <artifactId>productmanagement</artifactId>
-    <version>1.0.0</version>
+    <artifactId>seka-code-base</artifactId>
+    <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>ProductManagement Component</name>
+    <name>SEKA Code Base</name>
 
     <properties>
         <maven.compiler.release>19</maven.compiler.release>

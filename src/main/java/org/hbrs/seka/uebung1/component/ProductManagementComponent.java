@@ -13,6 +13,11 @@ import org.hbrs.seka.uebung1.port.ProductManagementPort;
 import java.util.Objects;
 
 public class ProductManagementComponent {
+
+    public static ProductManagementInt create() {
+        return create(null);
+    }
+
     public static ProductManagementInt create(Caching cache) {
         cache = Objects.requireNonNullElse(cache, new NoOpCache());
 
@@ -33,4 +38,5 @@ public class ProductManagementComponent {
 
         return new LoggingProductManagementPort(basePort, logger);
     }
+
 }
