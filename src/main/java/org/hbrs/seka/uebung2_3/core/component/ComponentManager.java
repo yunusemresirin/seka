@@ -1,11 +1,13 @@
-package org.hbrs.seka.uebung2.core.component;
+package org.hbrs.seka.uebung2_3.core.component;
 
-import org.hbrs.seka.uebung2.core.component.records.Component;
-import org.hbrs.seka.uebung2.core.component.records.ComponentStatus;
-import org.hbrs.seka.uebung2.core.component.records.RunningComponent;
-import org.hbrs.seka.uebung2.core.runtime.RuntimeState;
+import org.hbrs.seka.uebung2_3.core.component.records.Component;
+import org.hbrs.seka.uebung2_3.core.component.records.ComponentDeploymentStatus;
+import org.hbrs.seka.uebung2_3.core.component.records.ComponentStatus;
+import org.hbrs.seka.uebung2_3.core.component.records.RunningComponent;
+import org.hbrs.seka.uebung2_3.core.runtime.RuntimeState;
 
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -54,7 +56,6 @@ public class ComponentManager {
             throw new IllegalStateException("Keine laufende Instanz: " + instanceId);
         }
 
-
         instanceToComponentId.remove(instanceId);
         runner.stopComponent(runningComponent);
     }
@@ -91,6 +92,40 @@ public class ComponentManager {
                         RuntimeState.ACTIVE
                 ))
                 .toList();
+    }
+
+    public List<ComponentDeploymentStatus> deploymentStatuses() {
+        return deployedComponents.entrySet().stream()
+                .map(entry -> {
+                    String componentId = entry.getKey();
+                    boolean running = instanceToComponentId.containsValue(componentId);
+                    return new ComponentDeploymentStatus(
+                            componentId,
+                            entry.getValue().toString(),
+                            running ? RuntimeState.ACTIVE : RuntimeState.STOPPED
+                    );
+                })
+                .toList();
+    }
+
+    public Map<String, String> snapshotDeployedComponents() {
+        Map<String, String> snapshot = new LinkedHashMap<>();
+        deployedComponents.forEach((componentId, path) -> snapshot.put(componentId, path.toString()));
+        return snapshot;
+    }
+
+    public Map<String, String> snapshotRunningInstances() {
+        return new LinkedHashMap<>(instanceToComponentId);
+    }
+
+    public void restoreFromSnapshot(Map<String, String> deployed, Map<String, String> running) {
+        deployedComponents.clear();
+        runningComponents.clear();
+        instanceToComponentId.clear();
+        dispatchCounters.clear();
+
+        deployed.forEach((componentId, jarPath) -> deploy(componentId, Path.of(jarPath)));
+        running.forEach(this::start);
     }
 
 }

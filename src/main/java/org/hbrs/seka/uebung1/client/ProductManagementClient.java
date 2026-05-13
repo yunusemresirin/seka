@@ -3,8 +3,8 @@ package org.hbrs.seka.uebung1.client;
 import org.hbrs.seka.uebung1.api.ProductManagementInt;
 import org.hbrs.seka.uebung1.component.ProductManagementComponent;
 import org.hbrs.seka.uebung1.model.Product;
-import org.hbrs.seka.uebung2.core.component.annotations.Start;
-import org.hbrs.seka.uebung2.core.component.annotations.Stop;
+import org.hbrs.seka.uebung2_3.core.component.annotations.Start;
+import org.hbrs.seka.uebung2_3.core.component.annotations.Stop;
 
 public class ProductManagementClient {
 

@@ -1,4 +1,4 @@
-package org.hbrs.seka.uebung2.core.component.annotations;
+package org.hbrs.seka.uebung2_3.core.component.annotations;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

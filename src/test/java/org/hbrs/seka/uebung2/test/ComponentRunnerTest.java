@@ -1,8 +1,8 @@
 package org.hbrs.seka.uebung2.test;
 
-import org.hbrs.seka.uebung2.core.component.ComponentRunner;
-import org.hbrs.seka.uebung2.core.component.records.Component;
-import org.hbrs.seka.uebung2.core.component.records.RunningComponent;
+import org.hbrs.seka.uebung2_3.core.component.ComponentRunner;
+import org.hbrs.seka.uebung2_3.core.component.records.Component;
+import org.hbrs.seka.uebung2_3.core.component.records.RunningComponent;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
@@ -46,7 +46,7 @@ class ComponentRunnerTest {
 
         ClassLoader componentClassLoader = runningComponent.instance().getClass().getClassLoader();
 
-        /**
+        /*
          * Wenn der Kunde meint, abhängige Klassen müssten manuell nachgeladen werden, dann ist das so nicht ganz korrekt formuliert:
          * Wenn die Klasse im Jar enthalten ist, lädt der Custom-ClassLoader sie bei Bedarf selbst.
          * Wenn die Klasse nicht im Jar enthalten ist, dann muss sie natürlich extern im Classpath vorhanden sein oder explizit verfügbar gemacht werden.

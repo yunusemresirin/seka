@@ -1,9 +1,9 @@
-package org.hbrs.seka.uebung2.core.component;
+package org.hbrs.seka.uebung2_3.core.component;
 
-import org.hbrs.seka.uebung2.core.component.annotations.Start;
-import org.hbrs.seka.uebung2.core.component.annotations.Stop;
-import org.hbrs.seka.uebung2.core.component.records.Component;
-import org.hbrs.seka.uebung2.core.component.records.RunningComponent;
+import org.hbrs.seka.uebung2_3.core.component.annotations.Start;
+import org.hbrs.seka.uebung2_3.core.component.annotations.Stop;
+import org.hbrs.seka.uebung2_3.core.component.records.Component;
+import org.hbrs.seka.uebung2_3.core.component.records.RunningComponent;
 
 import java.io.File;
 import java.lang.reflect.Method;
