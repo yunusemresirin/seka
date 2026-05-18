@@ -1,11 +1,15 @@
 package org.hbrs.seka.uebung2_3.core.component;
 
+import org.hbrs.seka.uebung2_3.core.component.annotations.Inject;
 import org.hbrs.seka.uebung2_3.core.component.annotations.Start;
 import org.hbrs.seka.uebung2_3.core.component.annotations.Stop;
 import org.hbrs.seka.uebung2_3.core.component.records.Component;
 import org.hbrs.seka.uebung2_3.core.component.records.RunningComponent;
+import org.hbrs.seka.uebung2_3.core.logging.ConsoleLogger;
+import org.hbrs.seka.uebung2_3.core.logging.Logger;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -14,6 +18,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 public class ComponentRunner {
+
+    private final Logger logger = new ConsoleLogger();
 
     public void validateComponent(Component component) {
         try {
@@ -56,6 +62,7 @@ public class ComponentRunner {
                             );
                         }
 
+                        validateInjectFields(clazz, className);
                         startingClassCount++;
                     }
                 }
@@ -107,6 +114,8 @@ public class ComponentRunner {
 
                 if (startMethod != null && stopMethod != null) {
                     Object instance = clazz.getDeclaredConstructor().newInstance();
+
+                    injectLogger(instance);
 
                     Thread thread = new Thread(() -> {
                         try {
@@ -164,6 +173,63 @@ public class ComponentRunner {
         }
     }
 
+    private void validateInjectFields(Class<?> clazz, String className) {
+        int injectFieldCount = 0;
+
+        for (Field field : clazz.getDeclaredFields()) {
+            if (!field.isAnnotationPresent(Inject.class)) {
+                continue;
+            }
+
+            injectFieldCount++;
+
+            if (!Logger.class.isAssignableFrom(field.getType())) {
+                throw new IllegalStateException(
+                        "Feld " + field.getName() +
+                                " in " + className +
+                                " ist mit @Inject annotiert, aber nicht vom Typ Logger."
+                );
+            }
+        }
+
+        if (injectFieldCount > 1) {
+            throw new IllegalStateException(
+                    "Starting Class darf höchstens ein @Inject-Feld für Logger enthalten: " + className
+            );
+        }
+    }
+
+    private void injectLogger(Object instance) {
+        Class<?> currentClass = instance.getClass();
+
+        while (currentClass != null) {
+            for (Field field : currentClass.getDeclaredFields()) {
+                if (!field.isAnnotationPresent(Inject.class)) {
+                    continue;
+                }
+
+                if (!Logger.class.isAssignableFrom(field.getType())) {
+                    throw new IllegalStateException(
+                            "Feld " + field.getName() +
+                                    " ist mit @Inject annotiert, aber nicht vom Typ Logger."
+                    );
+                }
+
+                try {
+                    field.setAccessible(true);
+                    field.set(instance, logger);
+                } catch (IllegalAccessException e) {
+                    throw new IllegalStateException(
+                            "Logger konnte nicht in Feld " + field.getName() + " injiziert werden.",
+                            e
+                    );
+                }
+            }
+
+            currentClass = currentClass.getSuperclass();
+        }
+    }
+
     private Method findStartMethod(Class<?> clazz) {
         for (Method method : clazz.getDeclaredMethods()) {
             if (method.isAnnotationPresent(Start.class)) {
@@ -183,4 +249,5 @@ public class ComponentRunner {
 
         return null;
     }
+
 }
