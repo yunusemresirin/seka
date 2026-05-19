@@ -199,6 +199,14 @@ public class ComponentRunner {
         }
     }
 
+    /*
+        Die Injection des horizontalen Logging-Dienstes erfolgt beim Starten einer Komponenteninstanz,
+        nachdem die Start-Class durch die Laufzeitumgebung instanziiert wurde und bevor die mit @Start
+        annotierte Methode ausgeführt wird. Damit steht der Logger bereits während der Initialisierung
+        der Komponente zur Verfügung. Fachlich liegt die Injection im Zustandsübergang von DEPLOYED bzw.
+        STOPPED nach ACTIVE, genauer im Zwischenzustand STARTING. Beim reinen Deployment ist eine
+        Injection noch nicht sinnvoll, da noch keine konkrete Instanz existiert.
+    */
     private void injectLogger(Object instance) {
         Class<?> currentClass = instance.getClass();
 
