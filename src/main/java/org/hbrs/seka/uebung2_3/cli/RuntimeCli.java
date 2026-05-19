@@ -20,22 +20,6 @@ public class RuntimeCli {
     /** Beispiel ↓
 
       start
-      deploy product C:\components\product.jar
-      start-component product-1 product
-      start-component product-2 product
-      dispatch product
-      dispatch product
-      dispatch product
-      status
-      stop-component product-1
-      stop-component product-2
-      delete product
-      stop
-      exit
-
-     * -- oder --
-
-      start
       deploy demo C:\Users\Yunus\Projects\components\demo-component-1.0-SNAPSHOT.jar
       start-component demo-1 demo
       start-component demo-2 demo
