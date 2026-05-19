@@ -12,77 +12,96 @@ public class RuntimeManager {
     private final ComponentManager componentManager = new ComponentManager();
     private final RuntimePersistenceClient persistenceClient =
             new RuntimePersistenceClient(Path.of("runtime-snapshot.properties"));
-    private volatile RuntimeState state = RuntimeState.STOPPED;
+
+    private volatile RuntimeLifecycleState lifecycleState = new StoppedRuntimeState();
 
     public RuntimeManager(RuntimeSnapshot initialSnapshot) {
         restoreSnapshot(initialSnapshot);
     }
 
     public RuntimeState state() {
-        return state;
+        return lifecycleState.state();
     }
 
     public synchronized void start() {
-        if (state == RuntimeState.RUNNING) {
-            throw new IllegalStateException("Runtime läuft bereits.");
-        }
-
-        state = RuntimeState.RUNNING;
-        persistSnapshot();
+        lifecycleState.start(this);
     }
 
     public synchronized void stop() {
-        if (state != RuntimeState.RUNNING) {
-            throw new IllegalStateException("Runtime läuft nicht.");
-        }
-
-        componentManager.stopAll();
-        state = RuntimeState.STOPPED;
-        persistSnapshot();
+        lifecycleState.stop(this);
     }
 
     public void deploy(String componentId, Path jarPath) {
-        ensureRunning();
-        componentManager.deploy(componentId, jarPath);
-        persistSnapshot();
+        lifecycleState.deploy(this, componentId, jarPath);
     }
 
     public void delete(String componentId) {
-        ensureRunning();
-        componentManager.delete(componentId);
-        persistSnapshot();
+        lifecycleState.delete(this, componentId);
     }
 
     public void startComponent(String instanceId, String componentId) {
-        ensureRunning();
-        componentManager.start(instanceId, componentId);
-        persistSnapshot();
+        lifecycleState.startComponent(this, instanceId, componentId);
     }
 
     public void stopComponent(String instanceId) {
-        ensureRunning();
-        componentManager.stop(instanceId);
-        persistSnapshot();
+        lifecycleState.stopComponent(this, instanceId);
     }
 
     public void dispatch(String componentId) {
-        ensureRunning();
-        componentManager.dispatch(componentId);
+        lifecycleState.dispatch(this, componentId);
     }
 
     public List<ComponentStatus> instanceStatuses() {
-        ensureRunning();
-        return componentManager.statuses();
+        return lifecycleState.instanceStatuses(this);
     }
 
     public List<ComponentDeploymentStatus> deploymentStatuses() {
-        ensureRunning();
+        return lifecycleState.deploymentStatuses(this);
+    }
+
+    void changeState(RuntimeLifecycleState newState) {
+        this.lifecycleState = newState;
+    }
+
+    void stopAllComponents() {
+        componentManager.stopAll();
+    }
+
+    void deployComponent(String componentId, Path jarPath) {
+        componentManager.deploy(componentId, jarPath);
+    }
+
+    void deleteComponent(String componentId) {
+        componentManager.delete(componentId);
+    }
+
+    void startRuntimeComponent(String instanceId, String componentId) {
+        componentManager.start(instanceId, componentId);
+    }
+
+    void stopRuntimeComponent(String instanceId) {
+        componentManager.stop(instanceId);
+    }
+
+    void dispatchToComponent(String componentId) {
+        componentManager.dispatch(componentId);
+    }
+
+    List<ComponentStatus> componentStatuses() {
+        return componentManager.statuses();
+    }
+
+    List<ComponentDeploymentStatus> componentDeploymentStatuses() {
         return componentManager.deploymentStatuses();
+    }
+
+    void persistSnapshot() {
+        persistenceClient.saveSnapshot(createSnapshot());
     }
 
     private void restoreSnapshot(RuntimeSnapshot snapshot) {
         if (snapshot == null) {
-            state = RuntimeState.STOPPED;
+            lifecycleState = new StoppedRuntimeState();
             return;
         }
 
@@ -93,24 +112,22 @@ public class RuntimeManager {
             );
         }
 
-        state = snapshot.getState() != null ? snapshot.getState() : RuntimeState.STOPPED;
+        lifecycleState = toLifecycleState(snapshot.getState());
+    }
+
+    private RuntimeLifecycleState toLifecycleState(RuntimeState state) {
+        if (state == RuntimeState.RUNNING || state == RuntimeState.ACTIVE) {
+            return new RunningRuntimeState();
+        }
+
+        return new StoppedRuntimeState();
     }
 
     private RuntimeSnapshot createSnapshot() {
         return new RuntimeSnapshot(
-                state,
+                lifecycleState.state(),
                 componentManager.snapshotDeployedComponents(),
                 componentManager.snapshotRunningInstances()
         );
-    }
-
-    private void persistSnapshot() {
-        persistenceClient.saveSnapshot(createSnapshot());
-    }
-
-    private void ensureRunning() {
-        if (state != RuntimeState.RUNNING) {
-            throw new IllegalStateException("Runtime → " + state);
-        }
     }
 }
